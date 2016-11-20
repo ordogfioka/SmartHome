@@ -4,6 +4,7 @@ import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import cz.msebera.android.httpclient.HttpEntity;
@@ -26,20 +27,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        try {
-            HttpClient client = new DefaultHttpClient();
-            String postURL = "http://oktnb144.inf.elte.hu:8082/consumers/my_json_consumer";
-            HttpGet post = new HttpGet(postURL);
 
-            HttpResponse responseGet = client.execute(post);
-            tv.append(responseGet.toString());
+    }
+
+    public void onClick(View view) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    HttpClient client = new DefaultHttpClient();
+                    String postURL = "http://google.com";
+                    HttpGet post = new HttpGet(postURL);
+
+                    HttpResponse responseGet = client.execute(post);
+                    tv.setText(responseGet.toString());
 /*            HttpEntity resEntityGet = responseGet.getEntity();
             if (resEntityGet != null) {
                 //do something with the response
                 Log.i("GET ", EntityUtils.toString(resEntityGet));
             }*/
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
