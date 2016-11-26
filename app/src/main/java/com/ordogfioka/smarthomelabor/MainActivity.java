@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         String tmp = "[\"a\",\"b\",\"c\"]";
-                        tmp = tmp.substring(1).substring(0,tmp.length()-1);
-                        tmp.replaceAll("\"","");
+                        tmp = tmp.substring(1,tmp.length()-1);
+                        tmp = tmp.replaceAll("\"","");
                         arrayOfUsers = Arrays.asList(tmp.split(","));
                         textView.setText(finalResponse.toString());
                     }

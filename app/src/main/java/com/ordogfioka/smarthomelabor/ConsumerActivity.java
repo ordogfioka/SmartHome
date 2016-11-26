@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +55,15 @@ public class ConsumerActivity extends AppCompatActivity {
             } catch (Exception e) {
                 response = e.toString();
             }
+            response = "[{\"key\":null,\"value\":{\"name\":\"testUser\"},\"partition\":0,\"offset\":0}]";
+            try {
+
+                JSONArray jsonArray = new JSONArray(response);
+                response = jsonArray.getJSONObject(0).getString("value");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             final String finalResponse = response;
             runOnUiThread(new Runnable() {
                 @Override
