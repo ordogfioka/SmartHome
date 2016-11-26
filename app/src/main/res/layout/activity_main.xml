@@ -9,10 +9,16 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/refresh_topics"
         android:onClick="onClick"/>
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textBox"
-        android:text="Hello World!" />
+        android:text="@string/textView"
+        android:id="@+id/textView"/>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView">
+    </ListView>
 </LinearLayout>
