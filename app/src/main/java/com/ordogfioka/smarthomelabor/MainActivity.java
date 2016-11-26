@@ -15,6 +15,7 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.RunnableFuture;
 
@@ -72,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        String tmp = "[\"a\",\"b\",\"c\"]";
+                        tmp = tmp.substring(1).substring(0,tmp.length()-1);
+                        tmp.replaceAll("\"","");
+                        arrayOfUsers = Arrays.asList(tmp.split(","));
                         textView.setText(finalResponse.toString());
                     }
                 });
