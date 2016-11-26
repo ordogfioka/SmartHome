@@ -9,7 +9,6 @@ import android.widget.ListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,7 @@ public class ConsumerActivity extends AppCompatActivity {
     ListView listView = null;
     List<String> messages = new ArrayList<String>();
     ArrayAdapter<String> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +37,6 @@ public class ConsumerActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         new DoBackgroundTask().execute();
-        System.out.println("hello");
     }
 
     private class DoBackgroundTask extends AsyncTask<String, String, String> {
