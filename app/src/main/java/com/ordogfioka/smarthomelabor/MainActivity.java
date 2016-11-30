@@ -13,6 +13,10 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
     ListView listView = null;
     List<String> arrayOfUsers = new ArrayList<String>();
     ArrayAdapter<String> adapter;
-    TextView textView = null;
+    private JSONArray jsonList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
         listView =(ListView)findViewById(R.id.listView);
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayOfUsers);
         listView.setAdapter(adapter);
-        textView = (TextView) findViewById(R.id.textView);
-        tmp();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -42,12 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    private void tmp() {
-        arrayOfUsers.add("Alma");
-        arrayOfUsers.add("Barack");
-        arrayOfUsers.add("Körte");
     }
 
     @Override
@@ -61,23 +58,27 @@ public class MainActivity extends AppCompatActivity {
                 OkHttpClient client = new OkHttpClient();
 
                 Request request = new Request.Builder()
-                        .url("http://google.com")
+                        .url("http://oktnb144.inf.elte.hu:8082/topics")
                         .build();
                 Response response = null;
                 try {
                     response = client.newCall(request).execute();
-                } catch (IOException e) {
+                    jsonList = new JSONArray(response.body().string());
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 final Response finalResponse = response;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String tmp = "[\"a\",\"b\",\"c\"]";
-                        tmp = tmp.substring(1,tmp.length()-1);
-                        tmp = tmp.replaceAll("\"","");
-                        arrayOfUsers = Arrays.asList(tmp.split(","));
-                        textView.setText(finalResponse.toString());
+
+                        adapter.clear();
+                        for(int i=0;i<jsonList.length();i++)
+                            try {
+                                adapter.add((String) jsonList.get(i));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                     }
                 });
 

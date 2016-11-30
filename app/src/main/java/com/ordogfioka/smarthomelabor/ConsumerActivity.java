@@ -7,21 +7,26 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 
 public class ConsumerActivity extends AppCompatActivity {
     ListView listView = null;
     List<String> messages = new ArrayList<String>();
     ArrayAdapter<String> adapter;
+    int MAXIMUM_NUMBER_OF_MESSAGES = 20;
+    private String topic;
+    private String IMEI = "my_consumer_instance2";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,47 +35,93 @@ public class ConsumerActivity extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.consumerListView);
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,messages);
         listView.setAdapter(adapter);
-        messages.add((String) getIntent().getExtras().get("topic"));
+        topic = (String) getIntent().getExtras().get("topic");
+        messages.add(topic);
+        thread.start();
+
     }
+    Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            OkHttpClient client = new OkHttpClient();
+            try {
+                RequestBody body  = RequestBody.create(JSON,"{\"name\": \""+IMEI+"\", \"format\": \"json\", \"auto.offset.reset\": \"smallest\"}");
+                Request request = new Request.Builder()
+                        .url("http://oktnb144.inf.elte.hu:8082/consumers/my_json_consumer")
+                        .addHeader("Content-Type","application/vnd.kafka.v1+json")
+                        .post(body)
+                        .build();
+                Response response = client.newCall(request).execute();
+                if(200 == response.code())
+                    new DoBackgroundTask().execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    });
 
     @Override
     protected void onStart() {
         super.onStart();
-        new DoBackgroundTask().execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String url = "http://oktnb144.inf.elte.hu:8082/consumers/my_json_consumer/instances/" + IMEI;
+                Request request = new Request.Builder()
+                        .url(url)
+                        .delete()
+                        .build();
+                OkHttpClient client = new OkHttpClient();
+                try {
+                    Response res = client.newCall(request).execute();
+                    System.out.println(res.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private class DoBackgroundTask extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... params) {
-            String response = "";
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpPost = new HttpGet("http://google.com");
-
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url("http://oktnb144.inf.elte.hu:8082/consumers/my_json_consumer/instances/"+IMEI+"/topics/"+topic)
+                    .addHeader("Accept","application/vnd.kafka.json.v1+json")
+                    .build();
+            Response response = null;
             try {
-                // Execute POST
-                HttpResponse httpResponse = httpClient.execute(httpPost);
-                response = httpResponse.toString();
-            } catch (Exception e) {
-                response = e.toString();
-            }
-            response = "[{\"key\":null,\"value\":{\"name\":\"testUser\"},\"partition\":0,\"offset\":0}]";
-            try {
-
-                JSONArray jsonArray = new JSONArray(response);
-                response = jsonArray.getJSONObject(0).getString("value");
-            } catch (JSONException e) {
+                response = client.newCall(request).execute();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            final String finalResponse = response;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.add(finalResponse);
+            try {
+                JSONArray array = new JSONArray(response.body().string());
+                for(int i = 0;i<array.length();i++) {
+                    JSONObject obj = new JSONObject(array.get(i).toString());
+                    final String value = obj.getString("value");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (messages.size() > MAXIMUM_NUMBER_OF_MESSAGES)
+                                messages.remove(1);
+                            adapter.add(value);
+                        }
+                    });
                 }
-            });
-            return response;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
         @Override

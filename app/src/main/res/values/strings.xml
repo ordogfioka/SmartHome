@@ -2,5 +2,4 @@
     <string name="app_name">SmartHomeLabor</string>
     <string name="refresh_topics">Refresh topics</string>
     <string name="topics">topics</string>
-    <string name="textView">textView</string>
 </resources>
