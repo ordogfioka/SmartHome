@@ -27,6 +27,7 @@ public class ConsumerActivity extends AppCompatActivity {
     int MAXIMUM_NUMBER_OF_MESSAGES = 20;
     private String topic;
     private String IMEI = "my_consumer_instance2";
+    private boolean repeatQuery = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +54,10 @@ public class ConsumerActivity extends AppCompatActivity {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                if(200 == response.code())
+                if(200 == response.code()){
+                    repeatQuery = true;
                     new DoBackgroundTask().execute();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -69,6 +72,7 @@ public class ConsumerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        repeatQuery = false;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -127,6 +131,8 @@ public class ConsumerActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            if(repeatQuery == false)
+                return;
             new Handler().postDelayed(new Runnable() {
                 public void run() {
                     new DoBackgroundTask().execute();
