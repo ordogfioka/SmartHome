@@ -1,3 +1,3 @@
 # SmartHome
-![Alt text](/Picrures/Topics.jpg "Topics")
-![Alt text](/Picrures/Messages.jpg "Messages")
+![Alt text](https://github.com/ordogfioka/SmartHome/blob/master/KafDroid/Picrures/Topics.jpg "Topics")
+![Alt text](https://github.com/ordogfioka/SmartHome/blob/master/KafDroid/Picrures/Messages.jpg "Messages")
