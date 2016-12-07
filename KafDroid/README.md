@@ -1,3 +1,3 @@
 # SmartHome
-![Alt text](/Picrures/Topics.png "Topics")
-![Alt text](/Picrures/Messages.png "Messages")
+![Alt text](/Picrures/Topics.jpg "Topics")
+![Alt text](/Picrures/Messages.jpg "Messages")
