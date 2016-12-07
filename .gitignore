@@ -1,9 +1,9 @@
 *.iml
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-/captures
-.externalNativeBuild
+/KafDroid/.gradle
+/KafDroid/local.properties
+/KafDroid/.idea/workspace.xml
+/KafDroid/.idea/libraries
+/KafDroid.DS_Store
+/KafDroid/build
+/KafDroid/captures
+/KafDroid/.externalNativeBuild
